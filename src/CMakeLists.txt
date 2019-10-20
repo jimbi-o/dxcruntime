@@ -1,4 +1,5 @@
 include(FetchContent)
+
 FetchContent_Declare(
   spdlog
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
@@ -6,6 +7,7 @@ FetchContent_Declare(
   GIT_SHALLOW    ON
 )
 FetchContent_MakeAvailable(spdlog)
+
 FetchContent_Declare(
   doctest
   GIT_REPOSITORY https://github.com/onqtam/doctest.git
@@ -13,12 +15,25 @@ FetchContent_Declare(
   GIT_SHALLOW    ON
 )
 FetchContent_MakeAvailable(doctest)
+
+FetchContent_Declare(
+  dxc
+  GIT_REPOSITORY https://github.com/microsoft/DirectXShaderCompiler.git
+  GIT_TAG        a34bc162316895cb2837061a81abc31f3e49a1c0
+  GIT_SHALLOW    ON
+  )
+FetchContent_GetProperties(dxc)
+if(NOT dxc_POPULATED)
+  FetchContent_Populate(dxc)
+endif()
+
 if(NOT LIB_TEST_MODE)
   add_library(dxcruntime)
   target_compile_definitions(dxcruntime PRIVATE DOCTEST_CONFIG_DISABLE)
 else()
   add_executable(dxcruntime)
 endif()
+
 target_sources(dxcruntime PRIVATE
   "dxcruntime.cpp"
 )
@@ -27,11 +42,14 @@ if(LIB_TEST_MODE)
 	"test.cpp"
   )
 endif()
+
 target_include_directories(dxcruntime
   PUBLIC
   "../include"
   PRIVATE
   "./"
+  "${dxc_SOURCE_DIR}/include"
 )
+
 target_link_libraries(dxcruntime PRIVATE "spdlog" doctest::doctest)
 target_compile_features(dxcruntime PUBLIC cxx_std_17)
