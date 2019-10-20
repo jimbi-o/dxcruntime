@@ -3,7 +3,7 @@ include(FetchContent)
 FetchContent_Declare(
   spdlog
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
-  GIT_TAG        aa65dd89053bea0b7e0ffc8d9be4f152d5c01f44
+  GIT_TAG        1472048b974391905de2ec6779d3206be8753fe0
   GIT_SHALLOW    ON
 )
 FetchContent_MakeAvailable(spdlog)
@@ -11,7 +11,7 @@ FetchContent_MakeAvailable(spdlog)
 FetchContent_Declare(
   doctest
   GIT_REPOSITORY https://github.com/onqtam/doctest.git
-  GIT_TAG        f13a00cc27ed3c1ec4f755572ab7556c4cb01716
+  GIT_TAG        7ac22cc2190eb090ff66509015fb2d995bce957e
   GIT_SHALLOW    ON
 )
 FetchContent_MakeAvailable(doctest)
@@ -19,7 +19,7 @@ FetchContent_MakeAvailable(doctest)
 FetchContent_Declare(
   dxc
   GIT_REPOSITORY https://github.com/microsoft/DirectXShaderCompiler.git
-  GIT_TAG        a34bc162316895cb2837061a81abc31f3e49a1c0
+  GIT_TAG        a6a28a34bc78e1a629ad79294ac1c16eda789dc9
   GIT_SHALLOW    ON
   )
 FetchContent_GetProperties(dxc)
@@ -53,3 +53,4 @@ target_include_directories(dxcruntime
 
 target_link_libraries(dxcruntime PRIVATE "spdlog" doctest::doctest)
 target_compile_features(dxcruntime PUBLIC cxx_std_17)
+#TODO copy dlls
