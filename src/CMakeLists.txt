@@ -53,4 +53,14 @@ target_include_directories(dxcruntime
 
 target_link_libraries(dxcruntime PRIVATE "spdlog" doctest::doctest)
 target_compile_features(dxcruntime PUBLIC cxx_std_17)
-#TODO copy dlls
+
+# TODO lib mode
+set(DXCOMPILERDLL
+  "C:\\Program\ Files\ \(x86\)\\Windows\ Kits\\10\\bin\\${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}\\${CMAKE_VS_PLATFORM_NAME}\\dxcompiler.dll"
+)
+add_custom_command(
+  TARGET dxcruntime POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${DXCOMPILERDLL}
+  ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
+)
