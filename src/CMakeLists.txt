@@ -75,4 +75,6 @@ add_custom_command(
   ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
 )
 
-#TODO add shader files to binary directory
+if(LIB_TEST_MODE)
+  file(COPY shader DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endif()
