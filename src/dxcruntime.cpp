@@ -38,7 +38,7 @@ IDxcBlob* Compile(IDxcCompiler* compiler, IDxcBlob *source, LPCWSTR sourceName,
                               defines, defineCount,
                               include, &operationResult);
   if (FAILED(hr)) {
-    logwarn("Compile failed. {} {}", (char*)sourceName, hr);
+    logwarn(L"Compile failed. {} {}", sourceName, hr);
     IDxcBlobEncoding* error = nullptr;
     hr = operationResult->GetErrorBuffer(&error);
     if (SUCCEEDED(hr)) {
