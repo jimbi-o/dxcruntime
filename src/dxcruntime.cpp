@@ -19,6 +19,14 @@ IDxcCompiler* CreateCompiler(dxc::DxcDllSupport* const support) {
   }
   return compiler;
 }
+IDxcIncludeHandler* CreateDefaultIncludeHandler(IDxcLibrary* library) {
+  IDxcIncludeHandler* includeHandler = nullptr;
+  auto hr = library->CreateIncludeHandler(&includeHandler);
+  if (FAILED(hr)) {
+    logerror("CreateIncludeHandler failed. {}", hr);
+  }
+  return includeHandler;
+}
 IDxcBlob* CreateShaderBlob(IDxcLibrary* library, LPCWSTR filename) {
   IDxcBlobEncoding* blob = nullptr;
   auto hr = library->CreateBlobFromFile(filename, nullptr, &blob);
@@ -67,6 +75,11 @@ TEST_CASE("dxc test") {
   CHECK(library != nullptr);
   auto compiler = CreateCompiler(&support);
   CHECK(compiler != nullptr);
-  auto blob = CreateShaderBlob(library, L"test.hlsl");
-  CHECK(blob != nullptr);
+  auto include = CreateDefaultIncludeHandler(library);
+  CHECK(include != nullptr);
+  auto filename = L"test.hlsl";
+  auto shaderSource = CreateShaderBlob(library, filename);
+  CHECK(shaderSource != nullptr);
+  auto shaderBinary = Compile(compiler, shaderSource, filename, L"main", L"vs_6_1", nullptr, 0, nullptr, 0, include);
+  CHECK(shaderBinary != nullptr);
 }

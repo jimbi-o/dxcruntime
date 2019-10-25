@@ -74,3 +74,5 @@ add_custom_command(
   ${DXILDLL}
   ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
 )
+
+#TODO add shader files to binary directory
