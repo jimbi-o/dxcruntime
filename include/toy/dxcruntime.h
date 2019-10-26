@@ -2,6 +2,7 @@
 #define __TOY_DXCRUNTIME_H__
 #include <cstdint>
 #include <D3Dcommon.h>
+#include <dxc/dxcapi.h>
 namespace toy::dxcruntime {
 enum class ShaderTarget : uint8_t {
   PS, VS, CS, GS, DS, HS, LIB,

@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(doctest)
 FetchContent_Declare(
   dxc
   GIT_REPOSITORY https://github.com/microsoft/DirectXShaderCompiler.git
-  GIT_TAG        a6a28a34bc78e1a629ad79294ac1c16eda789dc9
+  GIT_TAG        07a970d3c1ab9573adff1ec7a9ecd3dac87f8867
   GIT_SHALLOW    ON
   )
 FetchContent_GetProperties(dxc)
@@ -47,34 +47,33 @@ endif()
 target_include_directories(dxcruntime
   PUBLIC
   "../include"
+  "${dxc_SOURCE_DIR}/include"
   PRIVATE
   "./"
-  "${dxc_SOURCE_DIR}/include"
 )
 
 target_link_libraries(dxcruntime PRIVATE "spdlog" doctest::doctest)
 target_compile_features(dxcruntime PUBLIC cxx_std_17)
 
-# TODO lib mode
-set(DXCOMPILERDLL
-  "C:\\Program\ Files\ \(x86\)\\Windows\ Kits\\10\\bin\\${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}\\${CMAKE_VS_PLATFORM_NAME}\\dxcompiler.dll"
-)
-set(DXILDLL
-  "C:\\Program\ Files\ \(x86\)\\Windows\ Kits\\10\\bin\\${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}\\${CMAKE_VS_PLATFORM_NAME}\\dxil.dll"
-)
-add_custom_command(
-  TARGET dxcruntime POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${DXCOMPILERDLL}
-  ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-)
-add_custom_command(
-  TARGET dxcruntime POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${DXILDLL}
-  ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-)
-
 if(LIB_TEST_MODE)
+  set(DXCOMPILERDLL
+	"C:\\Program\ Files\ \(x86\)\\Windows\ Kits\\10\\bin\\${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}\\${CMAKE_VS_PLATFORM_NAME}\\dxcompiler.dll"
+	)
+  set(DXILDLL
+	"C:\\Program\ Files\ \(x86\)\\Windows\ Kits\\10\\bin\\${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}\\${CMAKE_VS_PLATFORM_NAME}\\dxil.dll"
+	)
+  set(DLL_TARGET_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+  add_custom_command(
+	TARGET dxcruntime POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+	${DXCOMPILERDLL}
+	${DLL_TARGET_DIR}
+	)
+  add_custom_command(
+	TARGET dxcruntime POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+	${DXILDLL}
+	${DLL_TARGET_DIR}
+	)
   file(COPY shader DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()

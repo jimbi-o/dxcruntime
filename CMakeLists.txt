@@ -12,11 +12,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
 add_subdirectory(src)
-add_subdirectory(launcher)
 
 # for Visual Studio
-if(NOT LIB_TEST_MODE)
-  set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT launcher)
-else()
+if(LIB_TEST_MODE)
   set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT dxcruntime)
 endif()
