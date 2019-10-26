@@ -1,3 +1,4 @@
+#include <Windows.h>
 #include <dxgi1_6.h> // must include before dxcapi
 #include "dxc/Support/dxcapi.use.h"
 #include "logger.h"
@@ -53,6 +54,8 @@ IDxcBlob* Compile(IDxcCompiler* compiler, IDxcBlob *source, LPCWSTR sourceName,
       std::vector<char> errlog(error->GetBufferSize() + 1);
       memcpy(errlog.data(), error->GetBufferPointer(), errlog.size());
       logwarn("Compile error message. {}", errlog.data());
+    } else {
+      logwarn("get compile error message failed. {}", hr);
     }
     return nullptr;
   }
@@ -63,6 +66,24 @@ IDxcBlob* Compile(IDxcCompiler* compiler, IDxcBlob *source, LPCWSTR sourceName,
     return nullptr;
   }
   return result;
+}
+std::wstring GetAbsolutePath(LPCWSTR filename) {
+  auto len = GetCurrentDirectory(0, nullptr);
+  std::vector<char> buf(len);
+  len = GetCurrentDirectory(buf.size(), buf.data());
+  if (len + 1 != buf.size()) {
+    logwarn(L"GetCurrentDirectory failed. {} {}!={}", filename, len + 1, buf.size());
+    return L"";
+  }
+  std::wstring ret(len, L' ');
+  auto convlen = std::mbstowcs(ret.data(), buf.data(), len);
+  if (convlen != len) {
+    logwarn(L"mbstowcs failed. {} {}!={}", filename, convlen, len);
+    return L"";
+  }
+  ret.append(L"\\");
+  ret.append(filename);
+  return ret;
 }
 }
 #include "doctest/doctest.h"
@@ -77,8 +98,11 @@ TEST_CASE("dxc test") {
   CHECK(compiler != nullptr);
   auto include = CreateDefaultIncludeHandler(library);
   CHECK(include != nullptr);
-  auto filename = L"test.hlsl";
-  auto shaderSource = CreateShaderBlob(library, filename);
+  auto filename = L"shader\\test.hlsl";
+  auto filepath = GetAbsolutePath(filename);
+  loginfo(L"{}", filepath.c_str());
+  CHECK(filepath.length() > wcslen(filename));
+  auto shaderSource = CreateShaderBlob(library, filepath.c_str());
   CHECK(shaderSource != nullptr);
   auto shaderBinary = Compile(compiler, shaderSource, filename, L"main", L"vs_6_1", nullptr, 0, nullptr, 0, include);
   CHECK(shaderBinary != nullptr);
