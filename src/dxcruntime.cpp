@@ -75,7 +75,7 @@ std::wstring GetAbsolutePath(LPCWSTR filename) {
     logwarn(L"GetCurrentDirectory failed. {} {}!={}", filename, len + 1, buf.size());
     return L"";
   }
-  std::wstring ret(len, L' ');
+  std::wstring ret(len, L'\0');
   auto convlen = std::mbstowcs(ret.data(), buf.data(), len);
   if (convlen != len) {
     logwarn(L"mbstowcs failed. {} {}!={}", filename, convlen, len);
@@ -106,4 +106,8 @@ TEST_CASE("dxc test") {
   CHECK(shaderSource != nullptr);
   auto shaderBinary = Compile(compiler, shaderSource, filename, L"main", L"vs_6_1", nullptr, 0, nullptr, 0, include);
   CHECK(shaderBinary != nullptr);
+  shaderBinary->Release();
+  shaderSource->Release();
+  compiler->Release();
+  library->Release();
 }
