@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <dxgi1_6.h> // must include before dxcapi
 #include "dxc/Support/dxcapi.use.h"
+#include "toy/dxcruntime.h"
 #include "logger.h"
 // ref. https://posts.tanki.ninja/2019/07/11/Using-DXC-In-Practice/
 namespace toy::dxcruntime {
@@ -36,7 +37,7 @@ IDxcBlob* CreateShaderBlob(IDxcLibrary* library, LPCWSTR filename) {
   }
   return blob;
 }
-IDxcBlob* Compile(IDxcCompiler* compiler, IDxcBlob *source, LPCWSTR sourceName,
+ID3DBlob* Compile(IDxcCompiler* compiler, IDxcBlob *source, LPCWSTR sourceName,
                   LPCWSTR entryName, LPCWSTR targetProfile,
                   LPCWSTR* const arguments, const UINT32 argCount,
                   const DxcDefine* const defines, const UINT32 defineCount,
@@ -59,8 +60,8 @@ IDxcBlob* Compile(IDxcCompiler* compiler, IDxcBlob *source, LPCWSTR sourceName,
     }
     return nullptr;
   }
-  IDxcBlob* result = nullptr;
-  hr = operationResult->GetResult(&result);
+  ID3DBlob* result = nullptr;
+  hr = operationResult->GetResult((IDxcBlob**)&result);
   if (FAILED(hr)) {
     logwarn(L"Compiler GetResult failed. {} {}", sourceName, hr);
     return nullptr;
@@ -84,6 +85,40 @@ std::wstring GetAbsolutePath(LPCWSTR filename) {
   ret.append(L"\\");
   ret.append(filename);
   return ret;
+}
+ID3DBlob* CompileShader(LPCWSTR filename, LPCWSTR entryName, const ShaderTarget shaderTarget,
+                        const DxcDefine* const defines, const UINT32 defineCount) {
+  LPCWSTR targetlist[] = {
+    L"ps_6_4",
+    L"vs_6_4",
+    L"cs_6_4",
+    L"gs_6_4",
+    L"ds_6_4",
+    L"hs_6_4",
+    L"lib_6_4",
+  };
+  return CompileShader(filename, entryName, targetlist[static_cast<uint8_t>(shaderTarget)],
+                       defines, defineCount);
+}
+ID3DBlob* CompileShader(LPCWSTR filename, LPCWSTR entryName, const LPCWSTR targetProfile,
+                        const DxcDefine* const defines, const UINT32 defineCount) {
+  static dxc::DxcDllSupport support;
+  auto dllresult = support.Initialize();
+  if (dllresult != 0) return nullptr;
+  auto library = CreateLibrary(&support);
+  if (library == nullptr) return nullptr;
+  auto compiler = CreateCompiler(&support);
+  if (compiler == nullptr) return nullptr;
+  auto include = CreateDefaultIncludeHandler(library);
+  if (include == nullptr) return nullptr;
+  auto filepath = GetAbsolutePath(filename);
+  auto shaderSource = CreateShaderBlob(library, filepath.c_str());
+  if (shaderSource == nullptr) return nullptr;
+  auto shaderBinary = Compile(compiler, shaderSource, filename, L"main", L"vs_6_1", nullptr, 0, nullptr, 0, include);
+  shaderSource->Release();
+  compiler->Release();
+  library->Release();
+  return shaderBinary;
 }
 }
 #include "doctest/doctest.h"
@@ -110,4 +145,18 @@ TEST_CASE("dxc test") {
   shaderSource->Release();
   compiler->Release();
   library->Release();
+}
+TEST_CASE("dxc compile test") {
+  using namespace toy::dxcruntime;
+  auto filename = L"shader\\test.hlsl";
+  auto shader1 = CompileShader(filename, L"main", ShaderTarget::VS, nullptr, 0);
+  CHECK(shader1 != nullptr);
+  auto shader2 = CompileShader(filename, L"main", L"vs_6_4", nullptr, 0);
+  CHECK(shader2 != nullptr);
+  CHECK(shader1->GetBufferSize() == shader2->GetBufferSize());
+  std::vector<char> b1(shader1->GetBufferSize(), '\0');
+  std::vector<char> b2(shader2->GetBufferSize(), '\0');
+  CHECK(memcmp(b1.data(), b2.data(), b1.size()) == 0);
+  shader1->Release();
+  shader2->Release();
 }
