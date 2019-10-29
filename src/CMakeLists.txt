@@ -75,5 +75,10 @@ if(LIB_TEST_MODE)
 	${DXILDLL}
 	${DLL_TARGET_DIR}
 	)
-  file(COPY shader DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  add_custom_command(
+	TARGET dxcruntime POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	${CMAKE_CURRENT_SOURCE_DIR}/shader
+	${CMAKE_CURRENT_BINARY_DIR}/shader
+	)
 endif()
