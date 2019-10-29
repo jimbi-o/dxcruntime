@@ -114,7 +114,7 @@ ID3DBlob* CompileShader(LPCWSTR filename, LPCWSTR entryName, const LPCWSTR targe
   auto filepath = GetAbsolutePath(filename);
   auto shaderSource = CreateShaderBlob(library, filepath.c_str());
   if (shaderSource == nullptr) return nullptr;
-  auto shaderBinary = Compile(compiler, shaderSource, filename, L"main", L"vs_6_1", nullptr, 0, nullptr, 0, include);
+  auto shaderBinary = Compile(compiler, shaderSource, filename, entryName, targetProfile, nullptr, 0, defines, defineCount, include);
   shaderSource->Release();
   compiler->Release();
   library->Release();
