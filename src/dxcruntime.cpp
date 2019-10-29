@@ -154,9 +154,7 @@ TEST_CASE("dxc compile test") {
   auto shader2 = CompileShader(filename, L"main", L"vs_6_4", nullptr, 0);
   CHECK(shader2 != nullptr);
   CHECK(shader1->GetBufferSize() == shader2->GetBufferSize());
-  std::vector<char> b1(shader1->GetBufferSize(), '\0');
-  std::vector<char> b2(shader2->GetBufferSize(), '\0');
-  CHECK(memcmp(b1.data(), b2.data(), b1.size()) == 0);
+  CHECK(memcmp(shader1->GetBufferPointer(), shader2->GetBufferPointer(), shader2->GetBufferSize()) == 0);
   shader1->Release();
   shader2->Release();
 }
