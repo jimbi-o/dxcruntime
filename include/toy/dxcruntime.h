@@ -1,6 +1,7 @@
 #ifndef __TOY_DXCRUNTIME_H__
 #define __TOY_DXCRUNTIME_H__
 #include <cstdint>
+#include <vector>
 #include <D3Dcommon.h>
 #include <dxc/dxcapi.h>
 #include <dxgi1_6.h> // must include before dxcapi
@@ -17,10 +18,10 @@ class Compiler final {
  public:
   Compiler();
   ~Compiler();
-  ID3DBlob* CompileShader(LPCWSTR filename, LPCWSTR entryName, const ShaderTarget shaderTarget,
-                          const DxcDefine* const defines, const UINT32 defineCount);
-  ID3DBlob* CompileShader(LPCWSTR filename, LPCWSTR entryName, const LPCWSTR targetProfile,
-                          const DxcDefine* const defines, const UINT32 defineCount);
+  std::vector<uint8_t> CompileShader(LPCWSTR filename, LPCWSTR entryName, const ShaderTarget shaderTarget,
+                                     const DxcDefine* const defines, const UINT32 defineCount);
+  std::vector<uint8_t> CompileShader(LPCWSTR filename, LPCWSTR entryName, const LPCWSTR targetProfile,
+                                     const DxcDefine* const defines, const UINT32 defineCount);
  private:
   dxc::DxcDllSupport support_;
   IDxcLibrary* library_;

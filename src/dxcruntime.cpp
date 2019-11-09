@@ -98,17 +98,20 @@ Compiler::~Compiler() {
   compiler_->Release();
   library_->Release();
 }
-ID3DBlob* Compiler::CompileShader(LPCWSTR filename, LPCWSTR entryName, const LPCWSTR targetProfile,
-                                  const DxcDefine* const defines, const UINT32 defineCount) {
+std::vector<uint8_t> Compiler::CompileShader(LPCWSTR filename, LPCWSTR entryName, const LPCWSTR targetProfile,
+                                             const DxcDefine* const defines, const UINT32 defineCount) {
   auto filepath = GetAbsolutePath(filename);
   auto shaderSource = CreateShaderBlob(library_, filepath.c_str());
-  if (shaderSource == nullptr) return nullptr;
+  if (shaderSource == nullptr) return {};
   auto shaderBinary = Compile(compiler_, shaderSource, filename, entryName, targetProfile, nullptr, 0, defines, defineCount, include_);
   shaderSource->Release();
-  return shaderBinary;
+  std::vector<uint8_t> ret(shaderBinary->GetBufferSize());
+  memcpy(ret.data(), shaderBinary->GetBufferPointer(), ret.size());
+  shaderBinary->Release();
+  return ret;
 }
-ID3DBlob* Compiler::CompileShader(LPCWSTR filename, LPCWSTR entryName, const ShaderTarget shaderTarget,
-                                  const DxcDefine* const defines, const UINT32 defineCount) {
+std::vector<uint8_t> Compiler::CompileShader(LPCWSTR filename, LPCWSTR entryName, const ShaderTarget shaderTarget,
+                                             const DxcDefine* const defines, const UINT32 defineCount) {
   LPCWSTR targetlist[] = {
     L"ps_6_4",
     L"vs_6_4",
@@ -152,11 +155,7 @@ TEST_CASE("dxc compile test") {
   Compiler compiler;
   auto filename = L"shader\\test.hlsl";
   auto shader1 = compiler.CompileShader(filename, L"main", ShaderTarget::VS, nullptr, 0);
-  CHECK(shader1 != nullptr);
+  CHECK(!shader1.empty());
   auto shader2 = compiler.CompileShader(filename, L"main", L"vs_6_4", nullptr, 0);
-  CHECK(shader2 != nullptr);
-  CHECK(shader1->GetBufferSize() == shader2->GetBufferSize());
-  CHECK(memcmp(shader1->GetBufferPointer(), shader2->GetBufferPointer(), shader2->GetBufferSize()) == 0);
-  shader1->Release();
-  shader2->Release();
+  CHECK(shader1 == shader2);
 }
