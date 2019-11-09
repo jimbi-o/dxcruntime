@@ -3,7 +3,7 @@ include(FetchContent)
 FetchContent_Declare(
   spdlog
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
-  GIT_TAG        4858d7e454e66d347024a074749535b91ccbeed9
+  GIT_TAG        653ec05c0e82eed9c758ee28ecf40128da92a221
   GIT_SHALLOW    ON
 )
 FetchContent_MakeAvailable(spdlog)
@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(doctest)
 FetchContent_Declare(
   dxc
   GIT_REPOSITORY https://github.com/microsoft/DirectXShaderCompiler.git
-  GIT_TAG        f09333ba8860aa16aa3d287c3f1a1c3f146c9f47
+  GIT_TAG        462253a26346847e0eb3f3387aadd38f414f2f4b
   GIT_SHALLOW    ON
   )
 FetchContent_GetProperties(dxc)
@@ -28,7 +28,7 @@ if(NOT dxc_POPULATED)
   FetchContent_Populate(dxc)
 endif()
 
-if(NOT LIB_TEST_MODE)
+if(NOT DXCRUNTIME_STANDALONE)
   add_library(dxcruntime)
   target_compile_definitions(dxcruntime PRIVATE DOCTEST_CONFIG_DISABLE)
 else()
@@ -38,7 +38,7 @@ endif()
 target_sources(dxcruntime PRIVATE
   "dxcruntime.cpp"
 )
-if(LIB_TEST_MODE)
+if(DXCRUNTIME_STANDALONE)
   target_sources(dxcruntime PRIVATE
 	"test.cpp"
   )
@@ -55,7 +55,7 @@ target_include_directories(dxcruntime
 target_link_libraries(dxcruntime PRIVATE "spdlog" doctest::doctest)
 target_compile_features(dxcruntime PUBLIC cxx_std_17)
 
-if(LIB_TEST_MODE)
+if(DXCRUNTIME_STANDALONE)
   set(DXCOMPILERDLL
 	"C:\\Program\ Files\ \(x86\)\\Windows\ Kits\\10\\bin\\${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}\\${CMAKE_VS_PLATFORM_NAME}\\dxcompiler.dll"
 	)

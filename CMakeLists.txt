@@ -5,15 +5,14 @@ project(dxcruntime
   LANGUAGES CXX
 )
 
-option(LIB_TEST_MODE "library test mode (does not launch app)" OFF)
-
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+  set(DXCRUNTIME_STANDALONE TRUE)
 endif()
 
 add_subdirectory(src)
 
 # for Visual Studio
-if(LIB_TEST_MODE)
+if(DXCRUNTIME_STANDALONE)
   set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT dxcruntime)
 endif()
