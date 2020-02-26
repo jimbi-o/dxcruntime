@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(doctest)
 FetchContent_Declare(
   dxc
   GIT_REPOSITORY https://github.com/microsoft/DirectXShaderCompiler.git
-  GIT_TAG        eb33030b03ce91723f3c91ff6047601e0152e2a3
+  GIT_TAG        6599b8833489bacb44865e8d294300f423eb7716
   GIT_SHALLOW    ON
   )
 FetchContent_GetProperties(dxc)
