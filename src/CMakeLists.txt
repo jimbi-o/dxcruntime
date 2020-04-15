@@ -4,7 +4,6 @@ FetchContent_Declare(
   spdlog
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
   GIT_TAG        15ac7b08f7c36e475956d7e34b985e3d93116c9e
-  GIT_SHALLOW    ON
 )
 FetchContent_MakeAvailable(spdlog)
 target_compile_definitions(spdlog PUBLIC SPDLOG_WCHAR_TO_UTF8_SUPPORT)
@@ -13,7 +12,6 @@ FetchContent_Declare(
   doctest
   GIT_REPOSITORY https://github.com/onqtam/doctest.git
   GIT_TAG        f1e1c1b8d2d73e64359c45e0eec67eff4fdcc099
-  GIT_SHALLOW    ON
 )
 FetchContent_MakeAvailable(doctest)
 
@@ -21,7 +19,6 @@ FetchContent_Declare(
   dxc
   GIT_REPOSITORY https://github.com/microsoft/DirectXShaderCompiler.git
   GIT_TAG        5c4e942e8692bf1cf467c3719f3d93f77ea6c540
-  GIT_SHALLOW    ON
   )
 FetchContent_GetProperties(dxc)
 if(NOT dxc_POPULATED)
